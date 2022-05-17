@@ -1,128 +1,134 @@
+/*
+A book consists of chapters, chapters consist of sections and sections consist
+of subsections. Construct a tree and print the nodes. Find the time and space
+requirements of your method.
+*/
+
+
+
 #include <iostream>
-#include <fstream>
 using namespace std;
-class Student
-    {
+struct node 
+{
+    char label[20];
+    int ch_count;
+    struct node *child[10];
+};
+struct node *root;
+class BST 
+{
     public:
-        int roll;
-        char name[20];
-        char div;
-        char address[20];
-    void input()
+    void create();
+    void display(node *r1);
+    BST()
     {
-        cout << "Enter roll no. "; cin >> roll;
-        cout << "Enter name "; cin >>name;
-        cout << "Enter div "; cin >>div;
-        cout << "Enter address "; cin >>address;
+        root=NULL;
     }
-    void output()
+};
+void BST::create()
+{
+    int i ,j, k, tchapters, tbook;
+    root=new node;
+    cout<<"Enter the name of the book "<<endl;
+    cin>>root->label;
+    cout<<"Enter the number of chapters the book contains ";
+    cin>>tchapters;
+    root->ch_count=tchapters;
+    for(i=0; i<tchapters; i++)
     {
-        cout << endl<<"Roll no. is " << roll << endl; cout <<
-        "Name is " << name << endl; cout << "Div is "
-        << div << endl;
-        cout << "Address is " << address << endl; cout <<
-        "\n";
-    }
-    void write()
-    {
-        ofstream File;
-        File.open("File.dat", ios::binary | ios::app);
-        Student obj;
-        obj.input();
-        File.write((char *)&obj, sizeof(obj));
-        File.close();
-    }
-    void display()
-    {
-        ifstream File; 
-        File.open("File.dat", ios::binary);
-        Student obj;
-        while (File.read((char *)&obj, sizeof(obj)))
-            {
-            obj.output();
-            }
-        File.close();
-    }
-    void search(int n)
-    {
-        ifstream File; 
-        File.open("File.dat",ios::binary); 
-        int fl = 0;
-        Student obj;
-        while (File.read((char*)&obj, sizeof(obj)))
-            {
-            if (obj.roll == n)
-                {
-                obj.output();
-                fl = 1;
-                break;
-                }
-            }
-        if (fl == 0)
-        cout << "No records";
-        File.close();
-    }
-    void Delete(int n)
-    {
-    Student obj; 
-    ifstream File;
-    File.open("File.dat", ios::binary);
-    ofstream Temp; 
-    Temp.open("TempFile.dat",ios::binary);
-    while (File.read((char *)&obj, sizeof(obj)))
+        root->child[i]=new node;
+        cout<<"Enter the name of the chapter ";
+        cin>>root->child[i]->label;
+        
+        cout<<"Enter the number of sections in this chapter ";
+        cin>>root->child[i]->ch_count;
+        
+        for(j=0; j<root->child[i]->ch_count; j++)
         {
-        if (obj.roll != n)
+            root->child[i]->child[j]=new node;
+            cout<<"Enter section head ";
+            cin>>root->child[i]->child[j]->label;
+            
+            cout<<"Enter the number of sub-sections in this chapter ";
+            cin>>root->child[i]->child[j]->ch_count;
+            
+            for(k=0; k<root->child[i]->child[j]->ch_count; k++)
             {
-            Temp.write((char *)&obj, sizeof(obj));
+                root->child[i]->child[j]->child[k]=new node;
+                cout<<"Enter sub-section head ";
+                cin>>root->child[i]->child[j]->child[k]->label;
             }
         }
-    File.close();
-    Temp.close();
-    remove("File.dat"); 
-    rename("TempFile.dat","File.dat");
+        
     }
-    };
-int main()
+}
+void BST::display(node *r1)
+{
+    int i,j,k,tchapters;
+    if (r1!=NULL)
     {
-    int choice;
-    char ch;
-    int n, rollno, search;
-    Student obj;
-    do
+        cout<<"\n  -----Book Hierarchy-----";
+        cout<<"\n BOOK TITLE: "<<r1->label;
+        tchapters=r1->ch_count;
+        for(i=0; i<tchapters; i++)
         {
-        cout << "1.Add records\n2.Display records\n3.Search record\n4.Delete record" << endl;
-        cin >> choice;
-        switch (choice)
+            cout<<"\n----------------"<<endl;
+            cout<<"\n CHAPTER: "<<i+1<<". ";
+            cout<<r1->child[i]->label<<endl;
+            
+            
+            for(j=0; j<r1->child[i]->ch_count; j++)
             {
-            case 1:
-                cout << "enter how many records? ";
-                cin >> n;
-                for (int i = 0; i < n; i++)
+                cout<<"\n SECTION: ";
+                cout<<r1->child[i]->child[j]->label<<endl;
+                
+                
+                for(k=0; k<r1->child[i]->child[j]->ch_count; k++)
                 {
-                obj.write();
-                cout << endl;
+                    cout<<"\n SUB-SECTION: ";
+                    cout<<r1->child[i]->child[j]->child[k]->label<<endl;
                 }
-                break;
-            case 2:
-                obj.display();
-                cout << endl;
-                break;
-            case 3:
-                cout<<"enter roll no. to search "; 
-                cin>>search;
-                obj.search(search); cout << endl;
-                break;
-            case 4:
-                cout << "\nEnter the rollno. to delete"; 
-                cin >> rollno;
-                obj.Delete(rollno); cout << endl;
-                break;
-            default:
-                cout << "invalid choice"; 
-                break;
+                
             }
-        cout << "Do you want to continue? press y else n "; cin >>
-        ch;
-        } while (ch == 'y');
-        return 0;
+            
+            
+        }
     }
+}
+
+
+int main()
+{
+    int choice  ;
+    BST bst;
+    while(1)
+    {
+        cout<<"\n\n--------------"<<endl;
+        cout<<"Book tree creation"<<endl;
+        cout<<"---------------"<<endl;
+        cout<<"1.Create "<<endl;
+        cout<<"2.Display "<<endl;
+        cout<<"3.Quit "<<endl;
+        cout<<"Enter your choice: ";
+        cin>>choice;
+        switch(choice )
+        {
+            case 1: 
+            bst.create();
+            
+            case 2:
+            bst.display(root);
+            break;
+            
+            case 3: 
+            exit(1);
+            
+            default:
+            cout<<"Wrong choice "<<endl;
+        }
+        
+    }
+    
+
+    return 0;
+}
